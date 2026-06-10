@@ -1,5 +1,6 @@
 import type { PluginInput } from "@opencode-ai/plugin"
 import { createAtlasEventHandler } from "./event-handler"
+import { getPlanProgressIgnoringFinalWave } from "./plan-progress-ignore-final-wave"
 import { createToolExecuteAfterHandler } from "./tool-execute-after"
 import { createToolExecuteBeforeHandler } from "./tool-execute-before"
 import type { AtlasHookOptions, PendingTaskRef, SessionState } from "./types"
@@ -10,6 +11,10 @@ export function createAtlasHook(ctx: PluginInput, options?: AtlasHookOptions) {
   const pendingTaskRefs = new Map<string, PendingTaskRef>()
   const pendingPlanSnapshots = new Map<string, string>()
   const autoCommit = options?.autoCommit ?? true
+  const disableFinalVerificationWave = options?.disableFinalVerificationWave ?? false
+  const getPlanProgressOverride = disableFinalVerificationWave
+    ? getPlanProgressIgnoringFinalWave
+    : undefined
 
   function getState(sessionID: string): SessionState {
     let state = sessions.get(sessionID)
@@ -21,7 +26,7 @@ export function createAtlasHook(ctx: PluginInput, options?: AtlasHookOptions) {
   }
 
   return {
-    handler: createAtlasEventHandler({ ctx, options, sessions, getState }),
+    handler: createAtlasEventHandler({ ctx, options, sessions, getState, getPlanProgressOverride }),
     "tool.execute.before": createToolExecuteBeforeHandler({
       ctx,
       pendingFilePaths,
@@ -35,6 +40,7 @@ export function createAtlasHook(ctx: PluginInput, options?: AtlasHookOptions) {
       pendingTaskRefs,
       pendingPlanSnapshots,
       autoCommit,
+      disableFinalVerificationWave,
       getState,
       isCallerOrchestrator: options?.isCallerOrchestrator,
     }),

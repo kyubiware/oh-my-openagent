@@ -43,6 +43,7 @@ export async function buildPrometheusAgentConfig(params: {
   userCategories: Record<string, CategoryConfig> | undefined;
   currentModel: string | undefined;
   disabledTools?: readonly string[];
+  disableFinalVerificationWave?: boolean;
 }): Promise<Record<string, unknown>> {
   const categoryConfig = params.pluginPrometheusOverride?.category
     ? resolveCategoryConfig(params.pluginPrometheusOverride.category, params.userCategories)
@@ -98,7 +99,7 @@ export async function buildPrometheusAgentConfig(params: {
     ...(resolvedModel ? { model: resolvedModel } : {}),
     ...(variantToUse ? { variant: variantToUse } : {}),
     mode: "primary",
-    prompt: getPrometheusPrompt(resolvedModel, params.disabledTools),
+    prompt: getPrometheusPrompt(resolvedModel, params.disabledTools, params.disableFinalVerificationWave),
     permission: PROMETHEUS_PERMISSION,
     description: `${(params.configAgentPlan?.description as string) ?? "Plan agent"} (Prometheus - OhMyOpenCode)`,
     color: (params.configAgentPlan?.color as string) ?? "#FF5722",

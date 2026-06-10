@@ -93,6 +93,8 @@ export const OhMyOpenCodeConfigSchema = z.object({
   tmux: TmuxConfigSchema.optional(),
   sisyphus: SisyphusConfigSchema.optional(),
   start_work: StartWorkConfigSchema.optional(),
+  /** Skip the final verification wave when implementing plans — strips F1-F4 tasks from plan files and skips approval gate (default: false) */
+  disable_final_verification_wave: z.boolean().optional(),
   /** Default mode auto-activation settings (ultrawork, ralph loop) */
   default_mode: DefaultModeConfigSchema.optional(),
   /** Migration history to prevent re-applying migrations (e.g., model version upgrades) */

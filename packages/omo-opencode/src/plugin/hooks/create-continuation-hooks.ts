@@ -113,6 +113,7 @@ export function createContinuationHooks(args: {
             stopContinuationGuard?.isStopped(sessionID) ?? false,
           agentOverrides: pluginConfig.agents,
           autoCommit: pluginConfig.start_work?.auto_commit,
+          disableFinalVerificationWave: pluginConfig.disable_final_verification_wave ?? false,
         }))
     : null
 

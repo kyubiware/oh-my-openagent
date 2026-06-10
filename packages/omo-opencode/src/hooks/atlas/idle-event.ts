@@ -22,12 +22,14 @@ import {
   updateNoToolProgressIterations,
 } from "./tool-progress"
 import type { AtlasHookOptions, SessionState } from "./types"
+import type { PlanProgressFn } from "./resolve-active-boulder-session"
 
 export async function handleAtlasSessionIdle(input: {
   ctx: PluginInput
   options?: AtlasHookOptions
   getState: (sessionID: string) => SessionState
   sessionID: string
+  getPlanProgressOverride?: PlanProgressFn
 }): Promise<void> {
   const { ctx, options, getState, sessionID } = input
   const normalizedSessionID = normalizeSessionId(sessionID)
@@ -39,6 +41,7 @@ export async function handleAtlasSessionIdle(input: {
     client: ctx.client,
     directory: ctx.directory,
     sessionID,
+    getPlanProgressOverride: input.getPlanProgressOverride,
   })
   if (!activeBoulderSession) {
     log(`[${HOOK_NAME}] Skipped: session not registered in active boulder`, { sessionID })

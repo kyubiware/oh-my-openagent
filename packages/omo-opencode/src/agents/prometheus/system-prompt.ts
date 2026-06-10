@@ -12,6 +12,9 @@ export const PROMETHEUS_PERMISSION = {
 
 const QUESTION_TOOL_BLOCK_RE = /```typescript\r?\n\s*Question\(\{[\s\S]*?\}\)\s*\r?\n```/g
 
+// Matches "## Final Verification Wave" heading + content until next "## " heading or "---" separator
+const FINAL_VERIFICATION_WAVE_RE = /^## Final Verification Wave[\s\S]*?(?=\n^---|\n^## )/gm
+
 function loadPrometheusVariant(variant: PrometheusPromptSource): string {
   return loadPromptSync({
     source: prometheusPromptVariants[variant],
@@ -28,8 +31,18 @@ export function getPrometheusPromptSource(model?: string): PrometheusPromptSourc
   return "default"
 }
 
-export function getPrometheusPrompt(model?: string, disabledTools?: readonly string[]): string {
+export function getPrometheusPrompt(
+  model?: string,
+  disabledTools?: readonly string[],
+  disableFinalVerificationWave?: boolean,
+): string {
   const variant = getPrometheusPromptSource(model)
-  const body = loadPrometheusVariant(variant)
-  return disabledTools?.includes("question") ? body.replace(QUESTION_TOOL_BLOCK_RE, "") : body
+  let body = loadPrometheusVariant(variant)
+  if (disabledTools?.includes("question")) {
+    body = body.replace(QUESTION_TOOL_BLOCK_RE, "")
+  }
+  if (disableFinalVerificationWave) {
+    body = body.replace(FINAL_VERIFICATION_WAVE_RE, "")
+  }
+  return body
 }

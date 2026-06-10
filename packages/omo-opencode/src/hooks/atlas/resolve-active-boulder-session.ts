@@ -13,10 +13,13 @@ function isInactiveBoulderStatus(status: BoulderState["status"]): boolean {
   return status === "paused" || status === "abandoned"
 }
 
+export type PlanProgressFn = (planPath: string) => PlanProgress
+
 export async function resolveActiveBoulderSession(input: {
   client: PluginInput["client"]
   directory: string
   sessionID: string
+  getPlanProgressOverride?: PlanProgressFn
 }): Promise<{
   boulderState: BoulderState
   progress: PlanProgress
@@ -55,7 +58,8 @@ export async function resolveActiveBoulderSession(input: {
     return null
   }
 
-  const progress = getPlanProgress(
+  const progressFn = input.getPlanProgressOverride ?? getPlanProgress
+  const progress = progressFn(
     sessionWork
       ? resolveBoulderPlanPathForWork(input.directory, sessionWork)
       : resolveBoulderPlanPath(input.directory, nextBoulderState),

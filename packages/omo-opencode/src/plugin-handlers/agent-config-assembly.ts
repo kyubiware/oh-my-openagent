@@ -121,6 +121,7 @@ async function createCoreAgentConfig(
       userCategories: pluginConfig.categories,
       currentModel,
       disabledTools: pluginConfig.disabled_tools,
+      disableFinalVerificationWave: pluginConfig.disable_final_verification_wave,
     });
   }
 

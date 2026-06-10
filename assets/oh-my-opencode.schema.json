@@ -6651,6 +6651,9 @@
       ],
       "additionalProperties": false
     },
+    "disable_final_verification_wave": {
+      "type": "boolean"
+    },
     "default_mode": {
       "type": "object",
       "properties": {

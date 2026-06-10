@@ -16,6 +16,8 @@ export interface AtlasHookOptions {
   idleSettleMs?: number
   /** Enable auto-commit after each atomic task completion (default: true) */
   autoCommit?: boolean
+  /** Skip the final verification wave approval gate (default: false) */
+  disableFinalVerificationWave?: boolean
 }
 
 export interface ToolExecuteAfterInput {

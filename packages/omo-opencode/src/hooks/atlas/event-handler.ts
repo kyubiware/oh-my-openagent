@@ -5,14 +5,16 @@ import { HOOK_NAME } from "./hook-name"
 import { isAbortError } from "./is-abort-error"
 import { handleAtlasSessionIdle } from "./idle-event"
 import type { AtlasHookOptions, SessionState } from "./types"
+import type { PlanProgressFn } from "./resolve-active-boulder-session"
 
 export function createAtlasEventHandler(input: {
   ctx: PluginInput
   options?: AtlasHookOptions
   sessions: Map<string, SessionState>
   getState: (sessionID: string) => SessionState
+  getPlanProgressOverride?: PlanProgressFn
 }): (arg: { event: { type: string; properties?: unknown } }) => Promise<void> {
-  const { ctx, options, sessions, getState } = input
+  const { ctx, options, sessions, getState, getPlanProgressOverride } = input
 
   return async ({ event }): Promise<void> => {
     const props = event.properties as Record<string, unknown> | undefined
@@ -28,7 +30,7 @@ export function createAtlasEventHandler(input: {
       log(`[${HOOK_NAME}] session.error`, { sessionID, isAbort })
       if (!isAbort) {
         const previousInjectedAt = state.lastContinuationInjectedAt
-        await handleAtlasSessionIdle({ ctx, options, getState, sessionID })
+        await handleAtlasSessionIdle({ ctx, options, getState, sessionID, getPlanProgressOverride })
         if (
           state.lastContinuationInjectedAt !== undefined
           && state.lastContinuationInjectedAt !== previousInjectedAt
@@ -42,7 +44,7 @@ export function createAtlasEventHandler(input: {
     if (event.type === "session.idle") {
       const sessionID = resolveSessionEventID(props)
       if (!sessionID) return
-      await handleAtlasSessionIdle({ ctx, options, getState, sessionID })
+      await handleAtlasSessionIdle({ ctx, options, getState, sessionID, getPlanProgressOverride })
       return
     }
 
